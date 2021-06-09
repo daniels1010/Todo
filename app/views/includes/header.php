@@ -1,5 +1,6 @@
 <html lang="en">
     <head>
+        <!-- Header fails, kurš satur vispārējos datus un visus izmantotos stylesheet-us, scripti tiek linkoti tikai noteiktajos failos-->
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta http-equiv="Cache-control" content="no-cache">

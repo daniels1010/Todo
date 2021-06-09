@@ -1,6 +1,8 @@
 <?php
+    // piesaista header failu kurā ir <head> tags ar visu informāciju, stiliem un parējiem resursiem, kurus izmanto teju visās lapās
     require APPROOT . '/views/includes/header.php';
 
+    // Izveido CSRF atslēgu
     if(!isset($_SESSION)) {
         session_start();
     }
@@ -19,6 +21,7 @@
         <h3>Labot</h3>
     </div> 
     <div class="edit-form text-center">
+        <!-- Forma, kur piedāvā izmainīt virsrakstu un aprakstu. Tam līdzi padod CSRF atslēgu -->
         <form action="<?= URLROOT . "/todo/edit/". $data['post']->card_id ?>" method="POST">
             <input type="hidden" name="csrf" value="<?= $csrf ?>">
             <div>  

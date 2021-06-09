@@ -1,14 +1,13 @@
 <?php
+    // piesaista header failu kurā ir <head> tags ar visu informāciju, stiliem un parējiem resursiem, kurus izmanto teju visās lapās
     require APPROOT . '/views/includes/header.php';
-    $cardIds = array_map(function( $card) {
-        return $card->card_id;
-    }, $data['cards']);
 ?>
 
 <div class="container">
     <div class="text-center">
         <h1 class="todo-title">Darāmo lietu saraksts</h1>
     </div>
+    <!-- Izdrukā katru kartiņu, ar tās attiecīgajiem datiem-->
     <?php foreach($data['cards'] as $card) {?>
         <div class="card">
             <div class="row">
@@ -37,9 +36,10 @@
     </div>
 </div>
 <script>
+    // Padod .js pamata direktoriju
     var rootUrl = '<?=URLROOT?>';
-    var cardIds = [<?php echo implode(',', $cardIds) ?>];
 </script>
+    <!-- importē axios.js, lai veidotu asinhronus pieprasījumus (šajā gadijumā čekbokšus, kurus ieķeksējot nepārlādējas visa lapa) -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="<?= URLROOT ?>/public/javascript/javascript.js"></script>
 </body>
