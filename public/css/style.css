@@ -1,0 +1,65 @@
+.container {
+    background-color: rgb(255,242,162);
+}
+
+.card {
+    padding: 20px;
+    background: rgb(255,255,153);
+    margin-bottom: 5px;
+}
+
+.card-title {
+
+}
+.todo-title-box {
+    text-align: center;
+   
+}
+
+.todo-title {
+    font-size: 100px;
+    padding: 50px 0;
+}
+.card-description {
+    color: rgb(84, 84, 84);
+    font-size: 24px;
+}
+
+.card-age {
+    color: rgb(148, 148, 148);
+}
+
+.card-edit {
+    width: 55px;
+    height: 55px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.card-checkbox {
+    width: 55px;
+    height: 55px;
+    border: 1px solid grey;
+}
+
+.card-create-button-box {
+    text-align: center;
+    padding: 25px 0 50px 0;
+}
+
+.card-create-button {
+    width: 30%;
+    font-size: 30px;
+    font-weight: 700;
+    color: rgb(84, 84, 84);
+}
+
+@media only screen and (max-width: 600px) {
+    .card-create-button {
+        width: 90%;
+        overflow:hidden; 
+        white-space:nowrap; 
+        text-overflow: ellipsis;
+    }
+}
+
