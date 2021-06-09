@@ -8,6 +8,8 @@ Pēc visiem sistēmas noklusējumiem tā ir: C:\xampp\htdocs un jāpalaiž Apach
 
 Saite uz lapu: http://localhost/printful/todo 
 
+Caur xampp atverot phpmyadmin, jāizveido jauna datubāze 'todo_list' un jāimportē 'todo_list.sql', kurš atrodas šajā mapē.
+
 # Lietošana
 
 Var izveidot, rediģēt un pēctam dzēst darbus, jeb kartiņas.

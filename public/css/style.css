@@ -1,3 +1,9 @@
+body {
+    margin-top: 10px;
+    font-family: 'Rubik', sans-serif;
+    background-color: rgb(52,70,93);
+}
+
 .container {
     background-color: rgb(255,242,162);
 }
@@ -8,18 +14,16 @@
     margin-bottom: 5px;
 }
 
-.card-title {
-
-}
-.todo-title-box {
-    text-align: center;
-   
-}
-
 .todo-title {
     font-size: 100px;
     padding: 50px 0;
 }
+
+.todo-sub-title {
+    font-size: 24px;
+    padding: 50px 0;
+}
+
 .card-description {
     color: rgb(84, 84, 84);
     font-size: 24px;
@@ -43,15 +47,37 @@
 }
 
 .card-create-button-box {
-    text-align: center;
     padding: 25px 0 50px 0;
 }
 
 .card-create-button {
-    width: 30%;
     font-size: 30px;
     font-weight: 700;
     color: rgb(84, 84, 84);
+}
+
+.edit-title {
+    font-size: 60px;
+    padding: 25px 0;
+}
+
+.title-field {
+    width: 90%;
+    height: 36px;
+    font-size: 26px;
+    justify-content: center;
+    background-color: rgb(237, 208, 149);
+}
+
+.description-field {
+    width: 100%;
+    font-size: 24px;
+    background-color: rgb(237, 208, 149);
+}
+
+.custom-button {
+    margin: 5px 0;
+    width: 100%;
 }
 
 @media only screen and (max-width: 600px) {
