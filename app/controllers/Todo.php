@@ -1,5 +1,12 @@
 <?php
+session_start();
+
+if (empty($_SESSION['key'])) {
+    $_SESSION['key'] = bin2hex(random_bytes(32));
+} 
+
 class Todo extends Controller{
+
     public function  __construct() {
         $this->cardModel = $this->model('Card');
     }
@@ -28,17 +35,30 @@ class Todo extends Controller{
         ];
 
         if($_SERVER['REQUEST_METHOD']=='POST') {
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            if (!empty($_POST['csrf'])) {
+                if (!hash_equals($_SESSION['key'], $_POST['csrf'])) {
+                    die('CSRF atslēgas nesakrīt!');
+                }
+            }
+
+            $data = trim(INPUT_POST);
+            $data = stripslashes($data);
+            $data = filter_input_array($data, FILTER_SANITIZE_STRING);
             
             $data = [
-                'title' => trim($_POST['title']),
-                'description' => trim($_POST['description']),
+                'title' => trim($data['title']),
+                'description' => trim($data['description']),
                 'titleError' => '',
                 'descriptionError' => '',
             ];
 
             if (empty($data['title'])) {
                 $data['titleError'] = 'Lūdzu ievadiet virsrakstu';
+            } elseif (strlen($data['title'])>255){
+                $data['titleError'] = 'Virsraksta lauks nedrīkst pārsniegt 255 simbolus';
+            } elseif (strlen($data['description'])>255){
+                $data['descriptionError'] = 'Apraksta lauks nedrīkst pārsniegt 255 simbolus';
             } else {
                 if ($this->cardModel->saveCard($data)) {
                     header('location:'. URLROOT . '/todo/index');
@@ -61,18 +81,30 @@ class Todo extends Controller{
         ];
 
         if($_SERVER['REQUEST_METHOD']=='POST') {
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            if (!empty($_POST['csrf'])) {
+                if (!hash_equals($_SESSION['key'], $_POST['csrf'])) {
+                    die('CSRF atslēgas nesakrīt!');
+                }
+            }
+
+            $data = trim(INPUT_POST);
+            $data = stripslashes($data);
+            $data = filter_input_array($data, FILTER_SANITIZE_STRING);
             $data = [
                 'post' => $post,
                 'id' => $id,
-                'title' => trim($_POST['title']),
-                'description' => trim($_POST['description']),
+                'title' => trim($data['title']),
+                'description' => trim($data['description']),
                 'titleError' => '',
                 'descriptionError' => '',
             ];
 
             if (empty($data['title'])) {
                 $data['titleError'] = 'Virsraksta lauks nedrīkst būt tukšs';
+            } elseif (strlen($data['title'])>255){
+                $data['titleError'] = 'Virsraksta lauks nedrīkst pārsniegt 255 simbolus';
+            } elseif (strlen($data['description'])>255){
+                $data['descriptionError'] = 'Apraksta lauks nedrīkst pārsniegt 255 simbolus';
             } else {
                 if ($this->cardModel->updateCard($data)) {
                     header('location:'. URLROOT . '/todo/index');

@@ -1,5 +1,14 @@
 <?php
     require APPROOT . '/views/includes/header.php';
+
+    if(!isset($_SESSION)) {
+        session_start();
+    } 
+    if (empty($_SESSION['key'])) {
+        $_SESSION['key'] = bin2hex(random_bytes(32));
+    }
+
+    $csrf = $_SESSION['key'];
 ?>
 <div class="container">
     <div class="text-center">
@@ -10,10 +19,11 @@
     </div>
     <div class="edit-form text-center">
         <form action="<?= URLROOT ?>/todo/create" method="POST">
+            <input type="hidden" name="csrf" value="<?= $csrf ?>">
             <div> 
                 <label for="title">Virsraksts</label>
                 <br>
-                <input class="title-field" type="text" name="title">
+                <input class="title-field" type="text" name="title" required>
                 <span class="invalidFeedback">
                     <?= $data['titleError']?>
                 </span>
