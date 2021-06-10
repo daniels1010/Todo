@@ -1,3 +1,17 @@
+<?php
+
+    // Izveido CSRF atslēgu
+    if(!isset($_SESSION)) {
+        session_start();
+    }
+    if (empty($_SESSION['key'])) {
+        $_SESSION['key'] = bin2hex(random_bytes(32));
+    }
+
+    $csrf = $_SESSION['key'];
+    
+?>
+
 <html lang="en">
     <head>
         <!-- Header fails, kurš satur vispārējos datus un visus izmantotos stylesheet-us, scripti tiek linkoti tikai noteiktajos failos-->

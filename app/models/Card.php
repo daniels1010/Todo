@@ -29,7 +29,7 @@
             $this->db->query('UPDATE cards SET title = :title, description = :description, isChecked = :isChecked WHERE card_id = :id');
             $this->db->bind(':title', $data['title']);
             $this->db->bind(':description', $data['description']);
-            $this->db->bind(':id', $data['id']);
+            $this->db->bind(':id', $data['card_id']);
             $this->db->bind(':isChecked', $data['isChecked']);
             return $this->db->execute();
         }
@@ -55,14 +55,14 @@
             $ago = new DateTime($datetime);
 
             // Iegūst laika starpību, no izveidošanas laika un šī brīža,
-            $diff = $now->diff($ago);
+            $difference = $now->diff($ago);
         
             // Izrēķina cik nedēļas ir pagājušas
-            $diff->w = floor($diff->d / 7);
-            $diff->d -= $diff->w * 7;
+            $difference->w = floor($difference->d / 7);
+            $difference->d -= $difference->w * 7;
         
             // laika daudzumu apzīmējumi latviski string->daudzskaitlī singular->vienskaitlī
-            $string = array(
+            $plural = [
                 'y' => 'gadiem',
                 'm' => 'mēnešiem',
                 'w' => 'nedēļām',
@@ -70,9 +70,9 @@
                 'h' => 'stundām',
                 'i' => 'minūtēm',
                 's' => 'sekundēm',
-            );
+            ];
 
-            $singular = array(
+            $singular = [
                 'y' => 'gada',
                 'm' => 'mēneša',
                 'w' => 'nedēļas',
@@ -80,15 +80,18 @@
                 'h' => 'stundas',
                 'i' => 'minūtes',
                 's' => 'sekundes',
-            );    
+            ];  
+            
+            // Izveido jaunu masīvu ar laika vienību struktūru.
+            $string = $plural; 
 
             // pie katras laika vienības, ja tās skaits ir vismaz 1, tad tajā masīva vietā pieliek attiecīgo papildvārdu. 
             // Piemēram: '1' -> '1 sekunde', '4' -> '4 stundas', ja vērtība ir 0, tad vērtību noņem no masīva.
-            foreach ($string as $k => &$v) {
-                if ($diff->$k) {
-                    $v = $diff->$k . ' ' . ($diff->$k > 1 ? $string[$k] : $singular[$k]);
+            foreach ($string as $key => &$verb) {
+                if ($difference->$key) {
+                    $verb = $difference->$key . ' ' . ($difference->$key > 1 ? $plural[$key] : $singular[$key]);
                 } else {
-                    unset($string[$k]);
+                    unset($string[$key]);
                 }
             }
             

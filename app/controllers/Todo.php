@@ -5,14 +5,6 @@ class Todo extends Controller{
     public function  __construct() {
         // Piesaista modeli
         $this->cardModel = $this->model('Card');
-
-        // Izveido csrf atslēgu
-        session_start();
-
-        if (empty($_SESSION['key'])) {
-            $_SESSION['key'] = bin2hex(random_bytes(32));
-        } 
-
     }
 
     public function index() {
@@ -44,40 +36,27 @@ class Todo extends Controller{
         ];
 
         // Ja tiek saņemts post pieprasījums (nospiesta poga un adresēta šeit)
-        if($_SERVER['REQUEST_METHOD']=='POST') {
+        if($this->postMethod()) {
 
             // Pārbauda vai padotā un šeit ģenerētā csrf atslēga sakrīt
-            if (!empty($_POST['csrf'])) {
-                if (!hash_equals($_SESSION['key'], $_POST['csrf'])) {
-                    die('CSRF atslēgas nesakrīt!');
-                }
-            }
+            $this->validateCSRF();
 
             // Pārbauda un attīra ievaddatus
-            $input = trim(INPUT_POST);
-            $input = stripslashes($input);
-            $input = filter_input_array($input, FILTER_SANITIZE_STRING);
+            $input = $this->sanitizeInput(INPUT_POST);
             
             // Ievieto jaunos datus
-            $data = [
-                'title' => trim($input['title']),
-                'description' => trim($input['description']),
-                'titleError' => '',
-                'descriptionError' => '',
-            ];
+            $data['title'] = $input['title'];
+            $data['description'] = $input['description'];
+
+            // Validē jaunos datus
+            $data = $this->findInputErrors($data);
 
             // Validē jaunos datus, ja kaut kas neatbalst nosacījumiem, atgriež brīdinājumu
-            if (empty($data['title'])) {
-                $data['titleError'] = 'Lūdzu ievadiet virsrakstu';
-            } elseif (strlen($data['title'])>255){
-                $data['titleError'] = 'Virsraksta lauks nedrīkst pārsniegt 255 simbolus';
-            } elseif (strlen($data['description'])>255){
-                $data['descriptionError'] = 'Apraksta lauks nedrīkst pārsniegt 255 simbolus';
-            } else {
+            if ($this->checkIfInputError($data)) {
 
                 // Ja dati veiksmīgi validējas, tos saglabā datubāzē un atgriež uz galveno skatu (index), ja nē tad atgriež brīdinājuma ziņu
                 if ($this->cardModel->saveCard($data)) {
-                    header('location:'. URLROOT . '/todo/index');
+                    $this->returnToTodoIndex();
                 } else {
                     die('kaut kas nogāja greizi, mēģiniet vēlreiz.');
                 }
@@ -95,49 +74,37 @@ class Todo extends Controller{
         $post = $this->cardModel->findCardById($id);
         
         // Saglabā kartiņas objektu, kā $post, lai padotu uz skatu
+        // var_dump($post); die();
         $data = [
-            'post' => $post,
+            'card_id' => $post->card_id,
+            'title' => $post->title,
+            'description' => $post->description,
             'titleError' => '',
             'descriptionError' => '',
         ];
 
         // Ja tiek saņemts post pieprasījums (nospiesta poga un adresēta šeit)
-        if($_SERVER['REQUEST_METHOD']=='POST') {
+        if($this->postMethod()) {
 
             // Pārbauda vai padotā un šeit ģenerētā csrf atslēga sakrīt
-            if (!empty($_POST['csrf'])) {
-                if (!hash_equals($_SESSION['key'], $_POST['csrf'])) {
-                    die('CSRF atslēgas nesakrīt!');
-                }
-            }
+            $this->validateCSRF();
 
             // Attīra ievaddatus no potenciāliem uzbrukumiem un kaitēkļiem
-            $data = trim(INPUT_POST);
-            $data = stripslashes($data);
-            $data = filter_input_array($data, FILTER_SANITIZE_STRING);
+            $input = $this->sanitizeInput(INPUT_POST);
 
             // Saglabā ievaddatus masīvā, kopā ar pārējiem datiem
-            $data = [
-                'post' => $post,
-                'id' => $id,
-                'title' => trim($data['title']),
-                'description' => trim($data['description']),
-                'titleError' => '',
-                'descriptionError' => '',
-            ];
+            $data['title'] = $input['title'];
+            $data['description'] = $input['description'];
 
             // Validē jaunos datus, ja kaut kas neatbalst nosacījumiem, atgriež brīdinājumu
-            if (empty($data['title'])) {
-                $data['titleError'] = 'Virsraksta lauks nedrīkst būt tukšs';
-            } elseif (strlen($data['title'])>255){
-                $data['titleError'] = 'Virsraksta lauks nedrīkst pārsniegt 255 simbolus';
-            } elseif (strlen($data['description'])>255){
-                $data['descriptionError'] = 'Apraksta lauks nedrīkst pārsniegt 255 simbolus';
-            } else {
+            $data = $this->findInputErrors($data);
+            
+            // Validē jaunos datus, ja kaut kas neatbalst nosacījumiem, atgriež brīdinājumu
+            if ($this->checkIfInputError($data)) {
 
                 // Ja dati veiksmīgi validējas, tos atjaunina datubāzē un atgriež uz galveno skatu (index), ja nē tad atgriež brīdinājuma ziņu
                 if ($this->cardModel->updateCard($data)) {
-                    header('location:'. URLROOT . '/todo/index');
+                    $this->returnToTodoIndex();
                 } else {
                     die('kaut kas nogāja greizi, mēģiniet vēlreiz.');
                 }
@@ -151,14 +118,12 @@ class Todo extends Controller{
     public function delete($id) {
 
         // Ja tiek saņemts post pieprasījums (nospiesta poga un adresēta šeit)
-        if($_SERVER['REQUEST_METHOD']=='POST') {
+        if($this->postMethod()) {
 
-            // Ja atrod un var veiksmīgi izdzēst kartiņu to izdara un atgriež uz to pašu lapu (atjauno lapu)
+            // Ja atrod un var veiksmīgi izdzēst kartiņu to izdara un atgriež uz to pašu lapu (atjauno lapu), ja nevar, atgriež paziņojumu
             if ($this->cardModel->deleteCard($id)) {
-                header('location:'. URLROOT . '/todo/index');
+                $this->returnToTodoIndex();
             } else {
-
-                // Ja neizdodas izdzēst, tad atgriež ziņu
                 die('Nevarēja izdzēst pierakstu, lūdzu mēģiniet vēlreiz');
             }
         }
@@ -171,7 +136,7 @@ class Todo extends Controller{
 
         // Saglabā jau esošos datus, bet atķeksēšanas vietā atgriež pretējo vērtību (atķesēts -> neatķesēts un neatķeksēts -> atķeksēts)
         $data = [
-            'id' => $card->card_id,
+            'card_id' => $card->card_id,
             'title' => $card->title,
             'description' => $card->description,
             'isChecked' => !$card->isChecked

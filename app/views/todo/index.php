@@ -7,8 +7,10 @@
     <div class="text-center">
         <h1 class="todo-title">Darāmo lietu saraksts</h1>
     </div>
+
     <!-- Izdrukā katru kartiņu, ar tās attiecīgajiem datiem-->
     <?php foreach($data['cards'] as $card) {?>
+    
         <div class="card">
             <div class="row">
                 <div class="col-lg-1 col-md-1 col-2">

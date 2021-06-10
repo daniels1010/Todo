@@ -2,15 +2,6 @@
     // piesaista header failu kurā ir <head> tags ar visu informāciju, stiliem un parējiem resursiem, kurus izmanto teju visās lapās
     require APPROOT . '/views/includes/header.php';
 
-    // Izveido csrf atslēgu
-    if(!isset($_SESSION)) {
-        session_start();
-    } 
-    if (empty($_SESSION['key'])) {
-        $_SESSION['key'] = bin2hex(random_bytes(32));
-    }
-
-    $csrf = $_SESSION['key'];
 ?>
 <div class="container">
     <div class="text-center">
